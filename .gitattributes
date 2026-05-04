@@ -1,0 +1,61 @@
+# Unity files
+*.meta text merge=unityamlmerge eol=lf
+*.unity text merge=unityamlmerge eol=lf
+*.prefab text merge=unityamlmerge eol=lf
+*.asset text merge=unityamlmerge eol=lf
+*.mat text merge=unityamlmerge eol=lf
+*.anim text merge=unityamlmerge eol=lf
+*.controller text merge=unityamlmerge eol=lf
+*.overrideController text merge=unityamlmerge eol=lf
+*.physicMaterial2D text merge=unityamlmerge eol=lf
+*.physicsMaterial2D text merge=unityamlmerge eol=lf
+*.playable text merge=unityamlmerge eol=lf
+*.mask text merge=unityamlmerge eol=lf
+*.brush text merge=unityamlmerge eol=lf
+*.flare text merge=unityamlmerge eol=lf
+*.fontsettings text merge=unityamlmerge eol=lf
+*.guiskin text merge=unityamlmerge eol=lf
+*.giparams text merge=unityamlmerge eol=lf
+*.renderTexture text merge=unityamlmerge eol=lf
+*.spriteatlas text merge=unityamlmerge eol=lf
+*.terrainlayer text merge=unityamlmerge eol=lf
+*.preset text merge=unityamlmerge eol=lf
+*.signal text merge=unityamlmerge eol=lf
+*.unityScene text merge=unityamlmerge eol=lf
+
+# Config files
+*.cs text diff=csharp eol=lf
+*.json text eol=lf
+*.txt text eol=lf
+*.md text eol=lf
+*.gitignore text eol=lf
+*.gitattributes text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.bmp binary
+*.tga binary
+*.tiff binary
+*.psd binary
+*.ai binary
+*.pdf binary
+*.fbx binary
+*.obj binary
+*.max binary
+*.blend binary
+*.wav binary
+*.ogg binary
+*.mp3 binary
+*.aiff binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.zip binary
+*.7z binary
+*.rar binary
+*.apk binary
+*.aab binary
+*.exe binary
