@@ -7,7 +7,7 @@
 ### Architecture (How it's built)
 - [PlayerController-Design.md](PlayerController-Design.md) - Diseño completo: Controller/Pawn, input, cámara, state machine, data flow
 - [09-Three-Layer-Architecture.md](09-Three-Layer-Architecture.md) - Arquitectura en 3 capas, assembly definitions, reglas de dependencia
-- [08-Phase1-Development-Plan.md](08-Phase1-Development-Plan.md) - **Plan día a día para Phase 1**
+- [08-Phase1-Development-Plan.md](08-Phase1-Development-Plan.md) - ~~Deprecated~~ — ver Sprint Backlogs en [Development/](../Development/README.md)
 
 ### Systems (What it does)
 - [PlayerController-Specification.md](../Systems/PlayerController-Specification.md) - Requisitos funcionales y no funcionales

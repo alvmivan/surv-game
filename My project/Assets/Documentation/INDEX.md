@@ -27,10 +27,10 @@ El proyecto se organiza en tres capas (SurvGame → FPSGame → SurvivalProject)
 > Cómo se dividen las responsabilidades entre las tres capas, reglas de dependencia, Assembly Definitions y ejemplos de código.
 
 ### 4. Empezar a codear
-El plan de desarrollo tiene las tareas día por día para la Phase 1.
+Los Sprint Backlogs tienen las tareas concretas en formato SCRUM (stories + tasks con acceptance criteria).
 
-> **[08-Phase1-Development-Plan.md](Architecture/08-Phase1-Development-Plan.md)**  
-> Plan semana a semana con archivos a crear, criterios de aceptación y convenciones de git.
+> **[Phase1-Sprint1-Backlog.md](Development/Phase1-Sprint1-Backlog.md)**  
+> Sprint 1: Estructura Three-Layer, DI, interfaces, input system, Controller/Pawn. Empezá por acá.
 
 ---
 
@@ -43,7 +43,7 @@ El plan de desarrollo tiene las tareas día por día para la Phase 1.
 | [00-Overview.md](Architecture/00-Overview.md) | Overview del player controller, estado de fases | Para ver el roadmap general y el estado de cada fase |
 | [PlayerController-Design.md](Architecture/PlayerController-Design.md) | Diseño completo: Controller/Pawn, input pipeline, 3Cs, state machine, camera, interactions, environment, data flow, extensibilidad | Es el doc central de arquitectura, leerlo para entender cómo encaja todo |
 | [09-Three-Layer-Architecture.md](Architecture/09-Three-Layer-Architecture.md) | Arquitectura en 3 capas (SurvGame/FPSGame/SurvivalProject), assembly definitions, reglas de dependencia, namespace convention | Antes de crear cualquier archivo nuevo, para saber en qué capa va |
-| [08-Phase1-Development-Plan.md](Architecture/08-Phase1-Development-Plan.md) | Plan día a día para Phase 1 (2 semanas): estructura de carpetas, input system, Controller/Pawn, state machine, movement, coyote time | Cuando arranques a implementar |
+| [08-Phase1-Development-Plan.md](Architecture/08-Phase1-Development-Plan.md) | ~~Deprecated~~ — redirige a los Sprint Backlogs en Development/ | Solo para contexto histórico |
 
 ### Standards/ — Cómo escribir código
 
@@ -52,6 +52,14 @@ El plan de desarrollo tiene las tareas día por día para la Phase 1.
 | [Coding-Standards.md](Standards/Coding-Standards.md) | Folder structure (Three-Layer), naming conventions flat, code style, region order, SOLID examples, ScriptableObject patterns, testing, git commits, branch naming | Antes de escribir tu primer archivo .cs |
 | [01-Testable-Code-Guidelines.md](Standards/01-Testable-Code-Guidelines.md) | Cómo escribir código testeable: dependency injection, pure functions, interface segregation, no statics, domain vs infrastructure separation. Templates de código y checklist | Antes de escribir cualquier clase de domain |
 | [02-DI-Guidelines.md](Standards/02-DI-Guidelines.md) | API del injector (`com.torque-games.injector`): Register, Get, Create, TryGet, Reset, `[Inject]` attribute. Ejemplos de bootstrap, domain, tests. Reglas de uso por capa | Cuando necesites registrar o resolver dependencias |
+
+### Development/ — Plan de ejecución (SCRUM)
+
+| Documento | Qué contiene | Cuándo leerlo |
+|-----------|-------------|---------------|
+| [README.md](Development/README.md) | Cómo usar los backlogs (PM, AI Agent, Developer) | Para entender el formato |
+| [Phase1-Sprint1-Backlog.md](Development/Phase1-Sprint1-Backlog.md) | Sprint 1: Project Setup, DI, Interfaces, Input System, Controller/Pawn. 4 épicas, 6 stories, ~20 tasks | **Empezar acá para implementar** |
+| [Phase1-Sprint2-Backlog.md](Development/Phase1-Sprint2-Backlog.md) | Sprint 2: State Machine, Movement (6 estados), Coyote Time, Polish. 2 épicas, 5 stories, ~20 tasks | Después de completar Sprint 1 |
 
 ### Systems/ — Qué hace el juego
 
@@ -68,7 +76,7 @@ El plan de desarrollo tiene las tareas día por día para la Phase 1.
 1. [PlayerController-Specification.md](Systems/PlayerController-Specification.md) — qué hace el juego
 2. [09-Three-Layer-Architecture.md](Architecture/09-Three-Layer-Architecture.md) — dónde va cada cosa
 3. [Standards/Coding-Standards.md](Standards/Coding-Standards.md) — cómo nombrar y estructurar código
-4. [08-Phase1-Development-Plan.md](Architecture/08-Phase1-Development-Plan.md) — qué tarea hacer hoy
+4. [Phase1-Sprint1-Backlog.md](Development/Phase1-Sprint1-Backlog.md) — qué tarea hacer hoy
 
 ### Soy game designer
 1. [PlayerController-Specification.md](Systems/PlayerController-Specification.md) — los requisitos
