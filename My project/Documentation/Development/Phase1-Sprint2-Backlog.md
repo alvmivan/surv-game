@@ -202,5 +202,5 @@ Cuando ambos sprints están completos, Phase 1 está terminada:
 
 **Sprint anterior**: [Phase1-Sprint1-Backlog.md](Phase1-Sprint1-Backlog.md)  
 **Arquitectura**: [09-Three-Layer-Architecture.md](../Architecture/09-Three-Layer-Architecture.md)  
-**Valores canónicos**: Ver tabla en [AGENTS.md](../../../../AGENTS.md)  
+**Valores canónicos**: Ver tabla en [AGENTS.md](../../../AGENTS.md)  
 **Testing strategy**: [01-Phase1-Testing-Strategy.md](../Systems/01-Phase1-Testing-Strategy.md)
