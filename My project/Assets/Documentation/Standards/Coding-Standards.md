@@ -51,72 +51,6 @@ FPSGame (Layer 2) ← Generic FPS systems
     ↓ depends on  
 SurvGame (Layer 1) ← Generic survival systems
 ```
-Assets/
-├── Documentation/
-│   ├── Architecture/
-│   ├── Systems/
-│   └── Standards/
-│
-├── Features/                        # Feature-based organization
-│   │
-│   ├── Player/                      # Namespace: SurvGame.Player
-│   │   ├── Domain/
-│   │   │   ├── PlayerEntity.cs
-│   │   │   ├── MovementState.cs
-│   │   │   └── Interfaces/
-│   │   │       ├── IPlayerInput.cs
-│   │   │       ├── IMovable.cs
-│   │   │       └── IState.cs
-│   │   │
-│   │   ├── Application/
-│   │   │   ├── MovePlayerUseCase.cs
-│   │   │   └── ChangeViewModeUseCase.cs
-│   │   │
-│   │   ├── Infrastructure/
-│   │   │   ├── PlayerController.cs    # MonoBehaviour facade
-│   │   │   ├── PlayerMotor.cs
-│   │   │   ├── PlayerCamera.cs
-│   │   │   └── InputProvider.cs
-│   │   │
-│   │   ├── Data/
-│   │   │   ├── PlayerConfig.asset
-│   │   │   └── PlayerStats.asset
-│   │   │
-│   │   └── Presentation/
-│   │       ├── PlayerHUD/
-│   │       └── Crosshair/
-│   │
-│   ├── Inventory/                   # Namespace: SurvGame.Inventory
-│   │   ├── Domain/
-│   │   ├── Application/
-│   │   ├── Infrastructure/
-│   │   └── Data/
-│   │
-│   ├── Combat/                      # Namespace: SurvGame.Combat
-│   │   ├── Domain/
-│   │   ├── Application/
-│   │   ├── Infrastructure/
-│   │   └── Data/
-│   │
-│   └── Environment/                 # Namespace: SurvGame.Environment
-│       ├── Domain/
-│       ├── Application/
-│       ├── Infrastructure/
-│       └── Data/
-│
-├── Shared/                          # Cross-cutting concerns
-│   ├── Events/
-│   │   ├── IEventBus.cs
-│   │   └── GameEvent.cs
-│   ├── Extensions/
-│   ├── Utilities/
-│   └── Attributes/
-│
-└── Data/                            # Global ScriptableObjects
-    ├── Items/
-    ├── Weapons/
-    └── DamageTypes/
-```
 
 ## Naming Conventions
 
@@ -233,7 +167,7 @@ namespace SurvGame.Player
     public class PlayerConfig : ScriptableObject 
     { 
         public float WalkSpeed = 5f;
-        public float RunSpeedMultiplier = 1.5f;
+        public float RunSpeedMultiplier = 1.6f;
     }
 }
 ```
@@ -463,7 +397,7 @@ namespace FPSGame.Player
     {
         [Header("Movement")]
         public float BaseSpeed = 5f;
-        public float RunSpeedMultiplier = 1.5f;
+        public float RunSpeedMultiplier = 1.6f;
         
         [Header("References")]
         public HealthConfig HealthConfig;  // From Layer 1
@@ -535,10 +469,13 @@ namespace FPSGame.Player
     
     /// <summary>
     /// Core player entity for FPS games.
-    /// Inherits from <see cref="HealthEntity"/> (Layer 1).
+    /// Uses <see cref="HealthEntity"/> (Layer 1) via composition.
     /// </summary>
-    public class PlayerEntity : HealthEntity
+    public class PlayerEntity
     {
+        /// <summary>Health component from Layer 1.</summary>
+        public HealthEntity Health { get; }
+
         /// <summary>
         /// Moves the player in the specified direction.
         /// </summary>
@@ -589,7 +526,7 @@ namespace FPSGame.Player
     using SurvGame.Health;
     
     public interface IMovable { ... }
-    public class PlayerEntity : HealthEntity { ... }  // Combines both layers
+    public class PlayerEntity { ... }  // Uses HealthEntity via composition
 }
 
 // Layer 3: Your game uses both
@@ -627,34 +564,6 @@ namespace FPSGame.Player { }
 namespace SurvGame.Inventory { }
 ```
 
----
-
-**Version**: 2.0 (Three-Layer Architecture)  
-**Last Updated**: 2026-05-04  
-**Compliance**: SOLID, Clean Architecture, DDD, Three-Layer
-
-
-### What NOT to do
-```csharp
-// ❌ BAD: Deep namespace hierarchy
-using SurvGame.Player.Domain.Entities;    // NO!
-using SurvGame.Player.Infrastructure.Controllers;  // NO!
-
-// ❌ BAD: Feature folder called "Controllers"
-Features/
-├── Player/
-│   ├── Controllers/      // ❌ NO!
-│   ├── Models/          // ❌ NO!
-│   └── Views/          // ❌ NO!
-
-// ✅ GOOD: Feature folder is just the feature name
-Features/
-├── Player/              // ✅ GOOD
-│   ├── Domain/
-│   ├── Infrastructure/
-│   └── Data/
-```
-
 ## Performance Guidelines
 
 ### Memory
@@ -676,6 +585,6 @@ Features/
 
 ---
 
-**Version**: 1.2 (Feature-based architecture)  
+**Version**: 2.1 (Three-Layer Architecture — cleaned duplicates)  
 **Last Updated**: 2026-05-04  
-**Compliance**: SOLID, Clean Architecture, DDD, Feature-Based
+**Compliance**: SOLID, Clean Architecture, DDD, Three-Layer

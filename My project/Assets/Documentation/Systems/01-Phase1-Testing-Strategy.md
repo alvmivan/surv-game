@@ -122,24 +122,28 @@ public class MovementLogicTests
 ---
 
 ### 1.3 Input System Tests
-**File**: `Tests/Editor/Infrastructure/InputProviderTests.cs`
+**File**: `Tests/PlayMode/Infrastructure/InputProviderTests.cs`
+
+> **Nota**: `InputProvider` wraps Unity's Input System, which requires Play Mode to function.
+> For Edit Mode tests, test against the `IPlayerInput` interface using mocks instead.
 
 ```csharp
-[Test]
-public void MoveInput_ReturnsNormalizedVector()
+// Play Mode test (requires Unity Input System runtime)
+[UnityTest]
+public IEnumerator MoveInput_ReturnsNormalizedVector()
 {
     var input = new InputProvider();
-    // Simulate WASD = (1, 1)
+    yield return null; // Wait a frame for Input System init
     Vector2 move = input.MoveInput;
     Assert.LessOrEqual(move.magnitude, 1f); // Normalized
 }
 
+// Edit Mode alternative: test via IPlayerInput mock
 [Test]
-public void JumpPressed_ReturnsTrue_OnButtonPress()
+public void JumpPressed_ReturnsTrue_WhenMockReturnsTrue()
 {
-    var input = new InputProvider();
-    // Simulate Space press
-    bool pressed = input.JumpPressed;
+    var mockInput = new MockPlayerInput { JumpPressed = true };
+    bool pressed = mockInput.JumpPressed;
     Assert.IsTrue(pressed);
 }
 ```
@@ -244,7 +248,7 @@ public IEnumerator Player_MovesForward_WhenWPressed()
 }
 
 [UnityTest]
-public IEnumerator Player_Jumpes_WhenSpacePressed()
+public IEnumerator Player_Jumps_WhenSpacePressed()
 {
     yield return new EnterPlayMode();
     
@@ -481,4 +485,5 @@ BUG REPORT: [Title]
 ---
 
 **Next Phase**: Camera system testing (Phase 2)  
+**Version**: 1.1 (Fixed typos, InputProvider test approach)  
 **Last Updated**: 2026-05-04

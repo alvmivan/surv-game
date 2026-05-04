@@ -25,11 +25,12 @@ PlayerPawn (transient, can be replaced on death/respawn)
 - **Camera**: View modes, collision, effects
 - **Character**: Physical representation, animation, collision
 
-#### Fixed Timestep Updates (Guerrilla Games pattern)
+#### Fixed Timestep Updates
 ```
-Target: 15-30Hz for game logic (not render framerate)
-Benefit: Deterministic behavior across all platforms
-Implementation: Custom update loop or fixed delta time
+Player movement: Unity FixedUpdate at 50Hz (default Time.fixedDeltaTime = 0.02s)
+Non-critical systems (AI, environment): 15-30Hz custom tick (optional optimization)
+Input sampling: Update() (every frame) — stored and consumed in FixedUpdate
+Benefit: Deterministic physics, framerate-independent movement
 ```
 
 ### DDD (Domain-Driven Design)
@@ -149,7 +150,7 @@ PlayerPawn (Transient - respawns)
 │   ├── IMovable
 │   ├── IJumpable
 │   ├── ICrouchable
-│   └── FixedTimestepUpdater (15-30Hz)
+│   └── FixedTimestepUpdater (50Hz via FixedUpdate)
 │
 ├── PlayerCamera
 │   ├── ICameraController
@@ -239,13 +240,13 @@ interface IViewMode
 
 ## State Machine Design (with AAA Enhancements)
 
-### Movement State Machine (Fixed Timestep: 15-30Hz)
+### Movement State Machine (Fixed Timestep: 50Hz via FixedUpdate)
 ```
 BaseState (executes at fixed frequency)
 ├── GroundedState
 │   ├── IdleState (energy recovery)
 │   ├── WalkingState (base speed)
-│   ├── RunningState (stamina drain, 1.5x speed)
+│   ├── RunningState (stamina drain, 1.6x speed)
 │   └── CrouchingState (0.5x speed, smaller hitbox)
 ├── AirborneState
 │   ├── JumpingState (ascending, control available)
@@ -341,7 +342,7 @@ EnvironmentType
 ┌──────────────▼──────────────────────┐
 │   Domain Layer (Entities)           │
 │   - PlayerPawn entity              │
-│   - Fixed-timestep logic (15-30Hz) │
+│   - Fixed-timestep logic (50Hz)    │
 │   - Movement rules (deterministic)  │
 │   - Damage calculations             │
 │   - State transitions               │
@@ -513,16 +514,24 @@ For large-scale scenarios (1000+ entities):
 - **Unity DOTS Sample**: ECS character controller patterns
 
 ### Key Insights Applied
-1. **Fixed timestep** (15-30Hz) for deterministic movement
+1. **Fixed timestep** (50Hz via Unity FixedUpdate) for deterministic movement
 2. **Input abstraction** for device-agnostic controls
 3. **Coyote time + buffering** for forgiving platforming
 4. **Controller/Pawn split** for persistence through death
 5. **3Cs separation** for maintainable code
 6. **DOTS optional** for performance-critical scenarios
 
+### URLs de referencia
+- **Gaffer on Games — "Fix Your Timestep!"**: https://gafferongames.com/post/fix_your_timestep/ — Patrón de fixed timestep con accumulator. Nuestro approach usa el FixedUpdate de Unity (50Hz) que implementa este patrón internamente.
+- **John Austin — "Fix your (Unity) Timestep!"**: https://johnaustin.io/articles/2019/fix-your-unity-timestep — Análisis detallado de cómo Unity implementa FixedUpdate a 50Hz y Update a 60Hz. Confirma que input debe leerse en Update() y consumirse en FixedUpdate().
+- **Unity Manual — Fixed Updates**: https://docs.unity3d.com/6000.3/Documentation/Manual/fixed-updates.html — Documentación oficial de Unity sobre FixedUpdate y Time.fixedDeltaTime.
+- **GameDeveloper — CharacterController vs Rigidbody**: https://www.gamedeveloper.com/programming/unity-character-controller-vs-rigidbody — Comparación de approaches para movimiento en Unity. CharacterController es preferido para FPS por no depender del physics tick para movimiento básico.
+- **Unreal Engine — Pawn documentation**: https://dev.epicgames.com/documentation/en-us/unreal-engine/pawn-in-unreal-engine — Referencia del patrón Controller/Pawn de Unreal en el que se basa nuestra separación.
+- **Unreal Engine — Parrot sample (Pawn + CharacterMovement)**: https://dev.epicgames.com/documentation/en-us/unreal-engine/parrot-pawn-player-controller-and-character-movement-in-unreal-engine — Ejemplo oficial de cómo Unreal separa Controller, Pawn y CharacterMovementComponent.
+
 ---
 
-**Document Version**: 1.0  
+**Document Version**: 1.1 (Fixed timestep values, RunSpeed, added URL references)  
 **Last Updated**: 2026-05-04  
 **Author**: Architecture Team  
 **Status**: Draft - Ready for Review

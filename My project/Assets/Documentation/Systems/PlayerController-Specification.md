@@ -10,8 +10,8 @@ Control all player-related behavior in a First Person Survival game, including m
 
 **States**:
 - **Idle**: Zero velocity, full control recovery
-- **Walking**: Base speed (3-5 m/s), low stamina drain
-- **Running**: 1.5x base speed, medium stamina drain
+- **Walking**: Base speed (5 m/s), low stamina drain
+- **Running**: 1.6x base speed (8 m/s), medium stamina drain
 - **Crouching**: 0.5x base speed, no stamina drain, reduces hitbox
 - **Jumping**: Vertical impulse, horizontal momentum preserved
 - **Falling**: Gravity applied, air control available
@@ -331,7 +331,7 @@ public class InjurySaveData
 
 ---
 
-**Version**: 1.0  
+**Version**: 1.1 (Unified canonical speed values)  
 **Status**: Draft  
 **Priority**: High  
 **Estimated Effort**: 6 weeks (full implementation)

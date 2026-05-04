@@ -201,29 +201,45 @@ namespace SurvivalProject.Features  // ✅ FLAT
 // SurvGame/Health/Domain/HealthEntity.cs
 namespace SurvGame.Health
 {
+    // Standalone health system — usable by any entity via composition
     public class HealthEntity
     {
+        public float MaxHealth { get; }
         public float CurrentHealth { get; private set; }
-        
-        public void TakeDamage(float amount)
+        public bool IsDead => CurrentHealth <= 0f;
+
+        public HealthEntity(float maxHealth)
         {
-            CurrentHealth -= amount;
+            MaxHealth = maxHealth;
+            CurrentHealth = maxHealth;
+        }
+
+        public virtual void TakeDamage(float amount)
+        {
+            CurrentHealth = Mathf.Max(0f, CurrentHealth - amount);
         }
     }
 }
 ```
 
-### Layer 2: FPSGame.Player (uses SurvGame)
+### Layer 2: FPSGame.Player (uses SurvGame via composition)
 ```csharp
 // FPSGame/Player/Domain/PlayerEntity.cs
 namespace FPSGame.Player
 {
     using SurvGame.Health;  // ← Using Layer 1
     
-    public class PlayerEntity : HealthEntity  // ← Inherits from Layer 1
+    // Composition over inheritance: PlayerEntity HAS a HealthEntity
+    public class PlayerEntity
     {
+        public HealthEntity Health { get; }  // ← Composed from Layer 1
         public Vector3 Position { get; set; }
-        
+
+        public PlayerEntity(float maxHealth)
+        {
+            Health = new HealthEntity(maxHealth);
+        }
+
         // FPS-specific: WASD movement
         public void Move(Vector2 input) { ... }
     }
@@ -238,20 +254,30 @@ namespace SurvivalProject.Features
     using FPSGame.Player;   // ← Using Layer 2
     using SurvGame.Health;  // ← Can also use Layer 1
     
-    public class SurvivalPlayer : FPSGame.Player.PlayerEntity
+    // Extends PlayerEntity with game-specific features
+    public class SurvivalPlayer
     {
-        // Game-specific: Add story progress
+        public PlayerEntity Player { get; }
         public int StoryProgress { get; set; }
-        
-        // Override with game-specific logic
+
+        public SurvivalPlayer(PlayerEntity player)
+        {
+            Player = player;
+        }
+
+        // Game-specific damage handling
         public void TakeDamage(float amount)
         {
-            base.TakeDamage(amount);
+            Player.Health.TakeDamage(amount);
             // Add game-specific: play hurt sound, show blood FX
         }
     }
 }
 ```
+
+> **Nota de diseño**: Se usa composición en vez de herencia para conectar capas.
+> Esto sigue el principio "favor composition over inheritance" que es best practice
+> en game dev con Unity (ref: https://gamedev.stackexchange.com/questions/160604).
 
 ## Feature Communication Between Layers
 
@@ -369,4 +395,4 @@ Is it game-specific? → SurvivalProject
 ---
 
 **Last Updated**: 2026-05-04  
-**Status**: Architecture v2.0 (Three-Layer)
+**Status**: Architecture v2.1 (Three-Layer — composition over inheritance, HealthEntity init fix)

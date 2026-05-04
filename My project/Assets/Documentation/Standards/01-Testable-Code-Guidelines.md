@@ -246,7 +246,7 @@ public void TakeDamage_ReducesHealth()
 
 ### Domain Entity Example
 ```csharp
-namespace MyGame.Domain.Entities
+namespace FPSGame.Player
 {
     /// <summary>
     /// Core player entity with state and behavior.
@@ -301,7 +301,7 @@ namespace MyGame.Domain.Entities
         #region Private Methods
         private void Die()
         {
-            CurrentState = MovementState.Dead;
+            CurrentState = MovementState.Idle; // TODO: add Dead state if needed
             _eventBus.Publish(new PlayerDiedEvent());
         }
         #endregion
@@ -313,7 +313,7 @@ namespace MyGame.Domain.Entities
 
 ### Infrastructure Monobehaviour Example
 ```csharp
-namespace MyGame.Infrastructure.Player
+namespace FPSGame.Player
 {
     /// <summary>
     /// Unity-specific player controller facade.
@@ -529,4 +529,5 @@ public void ChangeState_CallsEnterOnNewState()
 ---
 
 **Last Updated**: 2026-05-04  
+**Version**: 1.1 (Fixed namespaces to match project conventions)  
 **Status**: Active Reference
