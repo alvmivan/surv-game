@@ -371,6 +371,10 @@ namespace SurvGame.Player
 }
 ```
 
+## Dependency Injection
+
+El proyecto usa [`com.torque-games.injector`](https://github.com/alvmivan/injector) para DI. Ver **[02-DI-Guidelines.md](02-DI-Guidelines.md)** para API completa, ejemplos y reglas de uso.
+
 ## ScriptableObject Patterns
 
 ### Layer 1: SurvGame Configuration

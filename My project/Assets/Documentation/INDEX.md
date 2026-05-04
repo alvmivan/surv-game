@@ -51,6 +51,7 @@ El plan de desarrollo tiene las tareas día por día para la Phase 1.
 |-----------|-------------|---------------|
 | [Coding-Standards.md](Standards/Coding-Standards.md) | Folder structure (Three-Layer), naming conventions flat, code style, region order, SOLID examples, ScriptableObject patterns, testing, git commits, branch naming | Antes de escribir tu primer archivo .cs |
 | [01-Testable-Code-Guidelines.md](Standards/01-Testable-Code-Guidelines.md) | Cómo escribir código testeable: dependency injection, pure functions, interface segregation, no statics, domain vs infrastructure separation. Templates de código y checklist | Antes de escribir cualquier clase de domain |
+| [02-DI-Guidelines.md](Standards/02-DI-Guidelines.md) | API del injector (`com.torque-games.injector`): Register, Get, Create, TryGet, Reset, `[Inject]` attribute. Ejemplos de bootstrap, domain, tests. Reglas de uso por capa | Cuando necesites registrar o resolver dependencias |
 
 ### Systems/ — Qué hace el juego
 
@@ -99,6 +100,7 @@ El plan de desarrollo tiene las tareas día por día para la Phase 1.
 - **Motor**: Unity 6000.2.6f2+
 - **Input**: Input System 1.7+
 - **Cámara**: Cinemachine 3.0+
+- **DI**: [alvmivan/injector](https://github.com/alvmivan/injector) — UPM package propio (`com.torque-games.injector`), MIT. Constructor injection con resolución recursiva, `[Inject]` attribute, `TryGet<T>()`, `Reset()`. Se instala como Git dependency en el manifest.
 - **Arquitectura**: Three-Layer (SurvGame → FPSGame → SurvivalProject)
 - **Patrones**: Controller/Pawn, State Machine, Strategy (view modes), Clean Architecture, DDD
 - **Testing**: Unity Test Framework (Edit Mode + Play Mode)
@@ -112,4 +114,5 @@ Ver [AGENTS.md](../../AGENTS.md) en la raíz del repo. Define reglas de document
 
 ---
 
-**Última actualización**: 2026-05-04
+**Última actualización**: 2026-05-04  
+**Última revisión de stack**: 2026-05-04 (agregado Injector DI)

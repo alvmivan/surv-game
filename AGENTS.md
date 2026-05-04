@@ -111,7 +111,7 @@ SurvGame/
 - **Events**: sufijo `Event`, verbo en pasado (`PlayerDamagedEvent`).
 - **ScriptableObjects**: sufijo `Config` o `Data` (`PlayerConfig`, `WeaponData`).
 - **Enums**: singular para valor único, plural para flags.
-- **DI**: Constructor injection para domain. `[SerializeField]` o `Awake()` para MonoBehaviours.
+- **DI**: Constructor injection para domain usando `com.torque-games.injector` ([repo](https://github.com/alvmivan/injector)). `[SerializeField]` o `Awake()` para MonoBehaviours. Usar `Injection.Register<TInterface, TImpl>()` para vincular interfaces con implementaciones. Usar `Injection.Reset()` en `[SetUp]` de tests.
 - **No statics en domain**: Inyectar wrappers (`IPhysicsService`) en vez de llamar `Physics.Raycast` directamente.
 
 ### Valores de diseño canónicos (Phase 1)
