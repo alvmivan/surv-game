@@ -16,14 +16,15 @@ First Person Survival game en **Unity 6000.2.6f2+**. Arquitectura en tres capas 
 /                                   ← Raíz del repo
 ├── AGENTS.md                       ← Este archivo
 ├── Metadocuments/                  ← Reviews y metadocumentación
+├── Documentation/                  ← Toda la documentación del juego (fuera de Unity)
+│   ├── INDEX.md                    ← ÍNDICE MAESTRO (fuente de verdad para navegación)
+│   ├── Architecture/               ← Cómo está construido
+│   ├── Standards/                  ← Cómo escribir código
+│   ├── Systems/                    ← Qué hace el juego
+│   └── Development/                ← Sprint backlogs (SCRUM)
 ├── README.md
 └── My project/                     ← Proyecto Unity
-    ├── Documentation/              ← Toda la documentación del juego (fuera de Assets)
-    │   ├── INDEX.md                ← ÍNDICE MAESTRO (fuente de verdad para navegación)
-    │   ├── Architecture/           ← Cómo está construido
-    │   ├── Standards/              ← Cómo escribir código
-    │   ├── Systems/                ← Qué hace el juego
-    │   └── Development/            ← Sprint backlogs (SCRUM)
+    └── Assets/
         ├── SurvGame/               ← Layer 1: survival genérico (sin dependencias)
         ├── FPSGame/                ← Layer 2: FPS genérico (depende de SurvGame)
         └── SurvivalProject/        ← Layer 3: el juego concreto (depende de ambas)

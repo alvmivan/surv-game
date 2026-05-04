@@ -121,7 +121,7 @@ Los Sprint Backlogs tienen las tareas concretas en formato SCRUM (stories + task
 
 ## Reglas para agentes de IA
 
-Ver [AGENTS.md](../../AGENTS.md) en la raíz del repo. Define reglas de documentación, código, y convenciones que cualquier IA debe seguir.
+Ver [AGENTS.md](../AGENTS.md) en la raíz del repo. Define reglas de documentación, código, y convenciones que cualquier IA debe seguir.
 
 ---
 
