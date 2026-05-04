@@ -1,7 +1,55 @@
 # Coding Standards - Survival Game
 
-## Folder Structure (Feature-Based)
+## Folder Structure (Three-Layer Architecture)
 
+```
+Assets/
+├── Documentation/
+│   ├── Architecture/
+│   ├── Systems/
+│   └── Standards/
+│
+├── SurvGame/                        # Layer 1: Generic Survival Systems
+│   ├── SurvGame.asmdef              # No dependencies
+│   │
+│   ├── Inventory/                   # namespace: SurvGame.Inventory
+│   │   ├── Domain/
+│   │   ├── Application/
+│   │   ├── Infrastructure/
+│   │   └── Data/
+│   │
+│   ├── Health/                      # namespace: SurvGame.Health
+│   ├── Crafting/                    # namespace: SurvGame.Crafting
+│   └── Shared/                      # namespace: SurvGame.Shared
+│
+├── FPSGame/                         # Layer 2: Generic FPS Systems
+│   ├── FPSGame.asmdef               # Depends on: SurvGame.asmdef
+│   │
+│   ├── Player/                      # namespace: FPSGame.Player
+│   │   ├── Domain/
+│   │   ├── Application/
+│   │   ├── Infrastructure/
+│   │   └── Data/
+│   │
+│   ├── Weapons/                     # namespace: FPSGame.Weapons
+│   ├── Camera/                      # namespace: FPSGame.Camera
+│   └── Shared/                      # namespace: FPSGame.Shared
+│
+└── SurvivalProject/                 # Layer 3: Your Specific Game
+    ├── SurvivalProject.asmdef        # Depends on: FPSGame.asmdef, SurvGame.asmdef
+    │
+    ├── Features/                    # namespace: SurvivalProject.Features
+    ├── Missions/
+    └── Configuration/
+```
+
+### Layer Dependencies
+```
+SurvivalProject (Layer 3)
+    ↓ depends on
+FPSGame (Layer 2) ← Generic FPS systems
+    ↓ depends on  
+SurvGame (Layer 1) ← Generic survival systems
 ```
 Assets/
 ├── Documentation/
@@ -72,54 +120,74 @@ Assets/
 
 ## Naming Conventions
 
-### Namespace Convention (FLAT - NO sub-namespaces!)
+### Three-Layer Namespace Convention (FLAT!)
 
 ```csharp
-// ✅ GOOD: One namespace per feature, FLAT
-namespace SurvGame.Player        // ✅ Simple!
-namespace SurvGame.Inventory     // ✅ Simple!
-namespace SurvGame.Combat        // ✅ Simple!
+// Layer 1: SurvGame (Generic Survival)
+namespace SurvGame.Inventory     // ✅ GOOD - Flat!
+namespace SurvGame.Health
+namespace SurvGame.Crafting
+
+// Layer 2: FPSGame (Generic FPS)
+namespace FPSGame.Player        // ✅ GOOD - Flat!
+namespace FPSGame.Weapons
+namespace FPSGame.Camera
+
+// Layer 3: SurvivalProject (Your Game)
+namespace SurvivalProject.Features   // ✅ GOOD - Flat!
+namespace SurvivalProject.Missions
 
 // ❌ BAD: Deep namespace hierarchy
-namespace SurvGame.Player.Domain.Controllers  // ❌ Too deep!
-namespace SurvGame.Player.Domain.Interfaces // ❌ NO!
+namespace SurvGame.Inventory.Items.Weapons  // ❌ Too deep!
+namespace FPSGame.Player.Domain.Interfaces // ❌ NO!
 ```
 
-### Feature Exposure (How features communicate)
-
+### Layer Usage Rules
 ```csharp
-// SurvGame.Player exposes to other features via:
-namespace SurvGame.Player
+// SurvGame can NOT use FPSGame or SurvivalProject
+namespace SurvGame.Inventory
 {
-    // Public interfaces in Domain/Interfaces
+    // ❌ BAD: using FPSGame.Player;  // Circular dependency!
+}
+
+// FPSGame CAN use SurvGame, but NOT SurvivalProject
+namespace FPSGame.Player
+{
+    using SurvGame.Health;  // ✅ GOOD
+    // ❌ BAD: using SurvivalProject.Features;
+}
+
+// SurvivalProject can use BOTH
+namespace SurvivalProject.Features
+{
+    using FPSGame.Player;    // ✅ GOOD
+    using SurvGame.Health;   // ✅ GOOD
+}
+```
+
+### Layer Exposure (How layers communicate)
+```csharp
+// Layer 1 exposes to upper layers:
+namespace SurvGame.Inventory
+{
+    public interface IItemContainer { ... }
+    public class InventorySystem { ... }
+    public class ItemAddedEvent { ... }
+}
+
+// Layer 2 uses Layer 1, exposes to Layer 3:
+namespace FPSGame.Player
+{
+    using SurvGame.Inventory;  // Can use Layer 1
+    
     public interface IPlayerInput { ... }
     public interface IMovable { ... }
-    public interface IPlayerController { ... }
-    
-    // Public events
-    public class PlayerMovedEvent { ... }
-    public class PlayerDamagedEvent { ... }
-    
-    // Public facade class
     public class PlayerController : MonoBehaviour { ... }
 }
 
-// Other features IMPORT the namespace:
-using SurvGame.Player;  // ✅ Simple import
-
-// In Combat feature:
-namespace SurvGame.Combat
-{
-    public class CombatSystem
-    {
-        private readonly IMovable _player;  // From SurvGame.Player
-        
-        public CombatSystem(IMovable player)
-        {
-            _player = player;
-        }
-    }
-}
+// Layer 3 imports both:
+using SurvGame.Inventory;  // Layer 1
+using FPSGame.Player;      // Layer 2
 ```
 
 ### Interfaces
@@ -281,14 +349,27 @@ namespace SurvGame.Player  // ONE namespace, flat!
 
 ## SOLID Implementation Examples
 
-### Single Responsibility
+### Single Responsibility (Across Layers)
 ```csharp
-namespace SurvGame.Player
+// Layer 1: SurvGame
+namespace SurvGame.Health
+{
+    public class HealthEntity { }  // Only health
+}
+
+// Layer 2: FPSGame (uses Layer 1)
+namespace FPSGame.Player
 {
     // Each class has ONE job
-    public class PlayerMotor : IMovable { }
-    public class PlayerCamera : ICameraController { }
-    public class InputProvider : IPlayerInput { }
+    public class PlayerMotor : IMovable { }      // Only movement
+    public class PlayerCamera : ICameraController { } // Only camera
+    public class InputProvider : IPlayerInput { }   // Only input
+}
+
+// Layer 3: SurvivalProject (uses both)
+namespace SurvivalProject.Features
+{
+    public class StoryMission { }  // Only story
 }
 ```
 
@@ -358,63 +439,87 @@ namespace SurvGame.Player
 
 ## ScriptableObject Patterns
 
-### Configuration Pattern
+### Layer 1: SurvGame Configuration
 ```csharp
-namespace SurvGame.Player
+namespace SurvGame.Health
 {
-    [CreateAssetMenu(menuName = "Player/Player Config")]
+    [CreateAssetMenu(menuName = "Survival/Health Config")]
+    public class HealthConfig : ScriptableObject
+    {
+        public float MaxHealth = 100f;
+        public float RegenRate = 1f;
+    }
+}
+```
+
+### Layer 2: FPSGame Configuration (uses Layer 1)
+```csharp
+namespace FPSGame.Player
+{
+    using SurvGame.Health;
+    
+    [CreateAssetMenu(menuName = "FPS/Player Config")]
     public class PlayerConfig : ScriptableObject
     {
         [Header("Movement")]
-        [Range(1f, 10f)] public float BaseSpeed = 5f;
-        [Range(1f, 20f)] public float RunSpeedMultiplier = 1.5f;
+        public float BaseSpeed = 5f;
+        public float RunSpeedMultiplier = 1.5f;
         
-        [Header("Health")]
-        public float MaxHealth = 100f;
-        public float RegenRate = 1f;
-        
-        // Validation
-        private void OnValidate()
-        {
-            BaseSpeed = Mathf.Max(0.1f, BaseSpeed);
-            MaxHealth = Mathf.Max(1f, MaxHealth);
-        }
+        [Header("References")]
+        public HealthConfig HealthConfig;  // From Layer 1
     }
 }
 ```
 
 ## Testing Patterns
 
-### Domain Logic Tests
+### Testing Layer 1 (SurvGame - No Dependencies)
 ```csharp
-namespace SurvGame.Player.Tests
+namespace SurvGame.Health.Tests
 {
     [TestFixture]
-    public class PlayerEntityTests
+    public class HealthEntityTests
     {
-        private PlayerEntity _player;
-        private MockPlayerStats _stats;
-        private MockEventBus _eventBus;
+        private HealthEntity _health;
         
         [SetUp]
         public void Setup()
         {
-            _stats = new MockPlayerStats { MaxHealth = 100f };
-            _eventBus = new MockEventBus();
-            _player = new PlayerEntity(_stats, _eventBus);
+            _health = new HealthEntity(100f);
         }
         
         [Test]
         public void TakeDamage_ReducesHealth()
         {
-            // Arrange
-            var damage = new DamageData { Amount = 30f, Type = DamageType.Physical };
-            
-            // Act
-            _player.TakeDamage(damage);
-            
-            // Assert
-            Assert.AreEqual(70f, _player.CurrentHealth);
+            _health.TakeDamage(30f);
+            Assert.AreEqual(70f, _health.CurrentHealth);
+        }
+    }
+}
+```
+
+### Testing Layer 2 (FPSGame - Depends on Layer 1)
+```csharp
+namespace FPSGame.Player.Tests
+{
+    using SurvGame.Health;
+    
+    [TestFixture]
+    public class PlayerEntityTests
+    {
+        private PlayerEntity _player;
+        
+        [SetUp]
+        public void Setup()
+        {
+            _player = new PlayerEntity();
+        }
+        
+        [Test]
+        public void Move_ChangesPosition()
+        {
+            _player.Move(new Vector2(1, 0));
+            Assert.Greater(_player.Position.z, 0);
         }
     }
 }
@@ -422,78 +527,112 @@ namespace SurvGame.Player.Tests
 
 ## Documentation Standards
 
-### XML Documentation
+### XML Documentation (With Layer References)
 ```csharp
-namespace SurvGame.Player
+namespace FPSGame.Player
 {
+    using SurvGame.Health;
+    
     /// <summary>
-    /// Applies damage to the player, considering resistances and injuries.
+    /// Core player entity for FPS games.
+    /// Inherits from <see cref="HealthEntity"/> (Layer 1).
     /// </summary>
-    /// <param name="damage">The damage data containing amount, type, and hit location.</param>
-    /// <returns>True if player survived, false if health reached zero.</returns>
-    /// <remarks>
-    /// This method publishes a PlayerDamagedEvent that can be listened to by UI,
-    /// sound systems, and visual effects.
-    /// </remarks>
-    public bool TakeDamage(DamageData damage)
+    public class PlayerEntity : HealthEntity
     {
-        // Implementation
+        /// <summary>
+        /// Moves the player in the specified direction.
+        /// </summary>
+        /// <param name="direction">Movement direction (X: left/right, Y: forward/back).</param>
+        public void Move(Vector2 direction)
+        {
+            // Implementation
+        }
     }
 }
 ```
 
 ## Git Commit Standards
 
-### Commit Messages
+### Commit Messages (With Layer Prefix)
 ```
-feat(Player): add injury system with body part tracking
-fix(Player): correct FOV transition when switching view modes
-refactor(Player): extract movement logic from PlayerController
-docs(Architecture): update state machine design document
-test(Player): add unit tests for damage calculation
-```
-
-### Branch Naming (Feature-based)
-```
-feature/player-core-movement
-feature/player-camera-system
-feature/inventory-basic
-bugfix/player-camera-transition
-refactor/player-extract-domain
+feat(SurvGame-Health): add injury system with body part tracking
+feat(FPSGame-Player): implement coyote time for jumping
+fix(FPSGame-Camera): correct FOV transition when switching view modes
+feat(SurvivalProject): add story mission system
+docs(Architecture): update three-layer architecture document
+test(FPSGame-Player): add unit tests for movement
 ```
 
-## Feature Communication (Exposure Pattern)
+### Branch Naming (With Layer Prefix)
+```
+feature/survgame-inventory-system
+feature/fpsgame-player-movement
+feature/fpsgame-camera-system
+feature/survivalproject-story-missions
+bugfix/fpsgame-player-coyote-time
+```
 
-### How Features Expose Functionality
+## Layer Communication (Exposure Pattern)
+
+### How Layers Expose Functionality
 ```csharp
-// ✅ GOOD: Feature exposes via public interfaces/classes in namespace
-namespace SurvGame.Player
+// Layer 1: SurvGame exposes to upper layers
+namespace SurvGame.Health
 {
-    // Exposed to other features
-    public interface IPlayerInput { ... }
-    public interface IMovable { ... }
-    public class PlayerController : MonoBehaviour { ... }
-    
-    // Internal only (implicit)
-    internal class PlayerMotor { ... }  // Not for other features
+    public interface IDamageable { ... }
+    public class HealthEntity { ... }
 }
 
-// ✅ GOOD: Other feature uses it
-using SurvGame.Player;  // Simple import
-
-namespace SurvGame.Combat
+// Layer 2: FPSGame uses Layer 1, exposes to Layer 3
+namespace FPSGame.Player
 {
-    public class CombatSystem
+    using SurvGame.Health;
+    
+    public interface IMovable { ... }
+    public class PlayerEntity : HealthEntity { ... }  // Combines both layers
+}
+
+// Layer 3: Your game uses both
+namespace SurvivalProject.Features
+{
+    using FPSGame.Player;
+    using SurvGame.Health;
+    
+    public class GameManager
     {
-        private readonly IMovable _player;  // From Player feature
+        private readonly IMovable _player;
         
-        public CombatSystem(IMovable player)
+        public GameManager(IMovable player)
         {
-            _player = player;
+            _player = player;  // From Layer 2
         }
     }
 }
 ```
+
+### What NOT to do
+```csharp
+// ❌ BAD: Layer 1 trying to use Layer 2 (circular dependency!)
+namespace SurvGame.Health
+{
+    using FPSGame.Player;  // ❌ NO! Can't reference upper layer!
+}
+
+// ❌ BAD: Deep namespace hierarchy
+namespace FPSGame.Player.Domain.Entities { }
+namespace SurvGame.Inventory.Items.Weapons { }
+
+// ✅ GOOD: Flat namespaces
+namespace FPSGame.Player { }
+namespace SurvGame.Inventory { }
+```
+
+---
+
+**Version**: 2.0 (Three-Layer Architecture)  
+**Last Updated**: 2026-05-04  
+**Compliance**: SOLID, Clean Architecture, DDD, Three-Layer
+
 
 ### What NOT to do
 ```csharp
