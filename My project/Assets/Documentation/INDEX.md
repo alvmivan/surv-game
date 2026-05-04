@@ -41,7 +41,8 @@ Los Sprint Backlogs tienen las tareas concretas en formato SCRUM (stories + task
 | Documento | Qué contiene | Cuándo leerlo |
 |-----------|-------------|---------------|
 | [00-Overview.md](Architecture/00-Overview.md) | Overview del player controller, estado de fases | Para ver el roadmap general y el estado de cada fase |
-| [PlayerController-Design.md](Architecture/PlayerController-Design.md) | Diseño completo: Controller/Pawn, input pipeline, 3Cs, state machine, camera, interactions, environment, data flow, extensibilidad | Es el doc central de arquitectura, leerlo para entender cómo encaja todo |
+| [PlayerController-Design.md](Architecture/PlayerController-Design.md) | Diseño completo: Controller/Pawn, input pipeline, 3Cs, state machine, camera, interactions, environment, data flow | Es el doc central de arquitectura, leerlo para entender cómo encaja todo |
+| [PlayerController-Extensibility.md](Architecture/PlayerController-Extensibility.md) | Extensibility points, domain events, performance considerations, roadmap de fases, dependencies | Cuando necesites agregar features o entender el roadmap |
 | [09-Three-Layer-Architecture.md](Architecture/09-Three-Layer-Architecture.md) | Arquitectura en 3 capas (SurvGame/FPSGame/SurvivalProject), assembly definitions, reglas de dependencia, namespace convention | Antes de crear cualquier archivo nuevo, para saber en qué capa va |
 | [08-Phase1-Development-Plan.md](Architecture/08-Phase1-Development-Plan.md) | ~~Deprecated~~ — redirige a los Sprint Backlogs en Development/ | Solo para contexto histórico |
 
@@ -49,9 +50,11 @@ Los Sprint Backlogs tienen las tareas concretas en formato SCRUM (stories + task
 
 | Documento | Qué contiene | Cuándo leerlo |
 |-----------|-------------|---------------|
-| [Coding-Standards.md](Standards/Coding-Standards.md) | Folder structure (Three-Layer), naming conventions flat, code style, region order, SOLID examples, ScriptableObject patterns, testing, git commits, branch naming | Antes de escribir tu primer archivo .cs |
-| [01-Testable-Code-Guidelines.md](Standards/01-Testable-Code-Guidelines.md) | Cómo escribir código testeable: dependency injection, pure functions, interface segregation, no statics, domain vs infrastructure separation. Templates de código y checklist | Antes de escribir cualquier clase de domain |
-| [02-DI-Guidelines.md](Standards/02-DI-Guidelines.md) | API del injector (`com.torque-games.injector`): Register, Get, Create, TryGet, Reset, `[Inject]` attribute. Ejemplos de bootstrap, domain, tests. Reglas de uso por capa | Cuando necesites registrar o resolver dependencias |
+| [Coding-Standards.md](Standards/Coding-Standards.md) | Naming conventions flat, code style, region order, SOLID examples, git commits, branch naming | Antes de escribir tu primer archivo .cs |
+| [01-Testable-Code-Guidelines.md](Standards/01-Testable-Code-Guidelines.md) | Cómo escribir código testeable: DI, pure functions, interface segregation, no statics, checklist | Antes de escribir cualquier clase de domain |
+| [02-DI-Guidelines.md](Standards/02-DI-Guidelines.md) | API del injector (`com.torque-games.injector`): Register, Get, Create, TryGet, Reset, `[Inject]`. Reglas por capa | Cuando necesites registrar o resolver dependencias |
+| [03-Patterns-And-Examples.md](Standards/03-Patterns-And-Examples.md) | ScriptableObject patterns, testing patterns por capa, XML docs, layer communication, performance | Para ver ejemplos concretos de código por capa |
+| [04-Code-Templates.md](Standards/04-Code-Templates.md) | Templates: Domain Entity, Infrastructure MonoBehaviour, State Machine testing | Para copiar como base al crear nuevas clases |
 
 ### Development/ — Plan de ejecución (SCRUM)
 

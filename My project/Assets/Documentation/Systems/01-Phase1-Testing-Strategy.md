@@ -319,29 +319,7 @@ public IEnumerator CannotJump_After150ms_AfterWalkingOffLedge()
 
 ## 4. Performance Tests
 
-### 4.1 Frame Rate Tests
 **File**: `Tests/PlayMode/Performance/FrameRateTests.cs`
-
-```csharp
-[UnityTest]
-public IEnumerator Movement_UpdateTakesLessThan2ms()
-{
-    yield return new EnterPlayMode();
-    
-    var motor = SetupPlayer().GetComponent<PlayerMotor>();
-    float startTime = Time.realtimeSinceStartup;
-    
-    for (int i = 0; i < 1000; i++)
-    {
-        motor.Update();
-    }
-    
-    float elapsed = Time.realtimeSinceStartup - startTime;
-    float avgMs = (elapsed / 1000f) * 1000f;
-    
-    Assert.Less(avgMs, 2f, "Movement update should be < 2ms");
-}
-```
 
 **Benchmarks**:
 - [ ] Movement update < 2ms per frame
@@ -349,39 +327,15 @@ public IEnumerator Movement_UpdateTakesLessThan2ms()
 - [ ] Input processing < 0.5ms per frame
 - [ ] 60 FPS maintained with player active
 
+Approach: Loop 1000 updates, measure avg time with `Time.realtimeSinceStartup`, assert `< threshold`.
+
 ---
 
 ## 5. Playtest Checklist
 
-### 5.1 Movement Feel
-**Tester**: ___________  
-**Date**: ___________
+Ver la playtest checklist completa en **[Phase1-Sprint2-Backlog.md](../Development/Phase1-Sprint2-Backlog.md)** (Story 6.3, task T-6.3.5).
 
-#### Responsiveness
-- [ ] Movement feels instant (< 50ms input lag)
-- [ ] Jump feels responsive
-- [ ] Crouch toggles smoothly
-
-#### Speed
-- [ ] Walk speed feels appropriate
-- [ ] Run speed feels fast but controlled
-- [ ] Crouch speed feels slow
-
-#### Physics
-- [ ] Gravity feels natural (not too floaty, not too heavy)
-- [ ] Landing doesn't bounce
-- [ ] No jitter when moving against walls
-
-#### Coyote Time
-- [ ] Can jump after barely walking off ledge
-- [ ] Feels forgiving, not frustrating
-- [ ] Doesn't feel "cheaty"
-
-#### Bugs
-- [ ] No getting stuck on geometry
-- [ ] No falling through floor
-- [ ] No infinite jump glitch
-- [ ] No speed hacking by diagonal movement
+Resumen: responsiveness (< 50ms), speed feel, physics (gravity, landing), coyote time, no geometry bugs.
 
 ---
 
@@ -398,50 +352,6 @@ unity -runTests -projectPath . -testResults results.xml -testPlatform PlayMode
 # Run specific test category
 unity -runTests -projectPath . -testFilter "Movement"
 ```
-
-### 6.2 CI/CD Integration
-```yaml
-# .github/workflows/tests.yml
-name: Run Tests
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run Unity Tests
-        run: |
-          /opt/unity/Editor/Unity -runTests ...
-```
-
----
-
-## 7. Bug Report Template
-
-```
-BUG REPORT: [Title]
-
-**Severity**: Critical / High / Medium / Low
-**Reproducibility**: Always / Sometimes / Rarely
-
-**Steps to Reproduce**:
-1. 
-2. 
-3. 
-
-**Expected Behavior**:
-
-**Actual Behavior**:
-
-**Screenshots/Video**:
-
-**Environment**:
-- Unity Version: 
-- Platform: 
-- Input Device: 
-```
-
----
 
 ## Test Coverage Goals
 

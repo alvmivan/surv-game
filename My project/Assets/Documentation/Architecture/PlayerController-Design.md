@@ -358,151 +358,15 @@ EnvironmentType
 └─────────────────────────────────────┘
 ```
 
-### Performance Options (Unity DOTS)
-For large-scale scenarios (1000+ entities):
-- Use **ECS (Entity Component System)** for NPCs
-- **CharacterControllerComponent** with Job System
-- **Burst Compiler** for SIMD optimization
-- Keep Player as MonoBehaviour (needs rich interaction)
-- Convert NPCs to Entities for performance
+## Extensibility, Events, Roadmap & Dependencies
 
-## Extensibility Points (AAA-Style)
-
-### Adding New States
-1. Create new class implementing `IState`
-2. Define transition conditions (with coyote/buffer support)
-3. Register in `StateFactory` (ScriptableObject)
-4. No modification to existing states needed
-5. **Optional**: Add to `InputContext` if new inputs required
-
-### Adding New View Modes
-1. Implement `IViewMode` (with sensitivity multiplier)
-2. Add to `ViewModeConfig` ScriptableObject
-3. Inject via `IViewModeProvider`
-4. Configure camera collision settings per mode
-
-### Adding New Damage Types
-1. Add enum value to `DamageType`
-2. Create `DamageTypeData` ScriptableObject
-3. Configure resistances in `PlayerConfig`
-4. Add visual/sound feedback in `DamageFeedbackConfig`
-
-### Adding New Environments
-1. Add enum value to `EnvironmentType`
-2. Create `EnvironmentData` ScriptableObject
-3. Configure in `EnvironmentSystem`
-4. Add surface detection for footstep sounds
-
-### Adding New Input Devices
-1. Create `IDeviceAdapter` implementation
-2. Map device inputs to normalized actions (Vector2 move/look, buttons)
-3. Configure response curves per device
-4. Register in `InputRouter`
-
-### Adding Multiplayer Support
-1. `PlayerController` already persistent (good for networking)
-2. Add `NetworkPlayerController` (syncs input to server)
-3. Use `CharacterMovementComponent` pattern (server-authoritative)
-4. Client-side prediction with server reconciliation
-
-## Events and Messaging
-
-### Domain Events
-```csharp
-- PlayerDamagedEvent(DamageData, remainingHealth)
-- PlayerHealedEvent(float amount, totalHealth)
-- MovementStateChangedEvent(MovementState old, MovementState new)
-- ViewModeChangedEvent(IViewMode old, IViewMode new)
-- EnvironmentChangedEvent(EnvironmentType new)
-- InventoryChangedEvent(ItemData, int amount)
-```
-
-### Event Bus (ScriptableObject)
-- `GameEvent<T>` : generic event asset
-- `EventBus` : centralized or distributed
-- Listeners subscribe via `IEventListener<T>`
-
-## Testing Strategy
-
-### Unit Tests
-- Domain logic (damage calculation, state transitions)
-- Data validation (ScriptableObject integrity)
-
-### Integration Tests
-- Player movement in different environments
-- Camera mode switching
-- Interaction systems
-
-### Play Mode Tests
-- Full player controller scenarios
-- Performance benchmarks
-
-## Performance Considerations
-
-### Data-Oriented Design
-- Use `ScriptableObject` references, not copies
-- Cache component references
-- Object pooling for projectiles/effects
-
-### Update Optimization
-- State machine only updates active state
-- Camera updates only when view mode changes
-- Environment checks on trigger/interval, not per frame
-
-## Next Steps (AAA Production Pipeline)
-
-1. **Phase 1**: Core architecture + movement (2 weeks)
-   - PlayerController/Pawn separation
-   - Input system with device adapters
-   - Fixed-timestep movement state machine
-   - Ground detection + coyote time
-   - **Playtest**: Movement feel, responsiveness
-
-2. **Phase 2**: Camera system (1 week)
-   - View mode framework (Strategy pattern)
-   - First person implementation
-   - Camera collision + smoothing
-   - Head bob + injury sway
-   - **Playtest**: Camera comfort, motion sickness
-
-3. **Phase 3**: Interaction systems (2 weeks)
-   - Tree cutting (with tool effectiveness)
-   - Combat foundation (melee/ranged)
-   - Item pickup + inventory integration
-   - **Playtest**: Combat feel, attack timing
-
-4. **Phase 4**: Survival systems (2 weeks)
-   - Health/stamina/injury systems
-   - Environment detection
-   - Weather integration
-   - **Playtest**: Survival balance, difficulty
-
-5. **Phase 5**: Polish + feel (1 week)
-   - Response curves + aim assist
-   - Input buffering + coyote time tuning
-   - Camera effects (landing rumble, damage punch)
-   - Footstep sounds per surface
-   - **Playtest**: Overall game feel, accessibility
-
-6. **Phase 6** (Optional): Multiplayer prep
-   - Network architecture planning
-   - Server-authoritative movement
-   - Client-side prediction
-
-## Dependencies
-
-### Unity Packages
-- Input System (1.7+) - Device abstraction, context layers
-- Cinemachine (3.0+) - Camera modes, collision, noise
-- State Machine (custom or Asset Store)
-- **Optional for Performance**: Entities, Jobs, Burst (for 1000+ NPCs)
-
-### Project Dependencies
-- Inventory System (to be designed)
-- Item System (ScriptableObject-based)
-- UI System (for player HUD)
-- Audio System (footsteps, combat, environment)
-- Save System (persist PlayerController data)
+Ver **[PlayerController-Extensibility.md](PlayerController-Extensibility.md)** para:
+- Extensibility points (agregar estados, view modes, damage types, environments, input devices, multiplayer)
+- Events and messaging (domain events, event bus)
+- Testing strategy summary
+- Performance considerations (Data-Oriented Design, DOTS)
+- Roadmap de fases (Phase 1-6)
+- Unity packages y project dependencies
 
 ## References
 
@@ -531,7 +395,4 @@ For large-scale scenarios (1000+ entities):
 
 ---
 
-**Document Version**: 1.1 (Fixed timestep values, RunSpeed, added URL references)  
-**Last Updated**: 2026-05-04  
-**Author**: Architecture Team  
-**Status**: Draft - Ready for Review
+**Version**: 1.2 | **Updated**: 2026-05-04 | **Status**: Draft - Ready for Review

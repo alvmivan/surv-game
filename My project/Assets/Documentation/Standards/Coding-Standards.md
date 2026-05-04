@@ -2,55 +2,9 @@
 
 ## Folder Structure (Three-Layer Architecture)
 
-```
-Assets/
-├── Documentation/
-│   ├── Architecture/
-│   ├── Systems/
-│   └── Standards/
-│
-├── SurvGame/                        # Layer 1: Generic Survival Systems
-│   ├── SurvGame.asmdef              # No dependencies
-│   │
-│   ├── Inventory/                   # namespace: SurvGame.Inventory
-│   │   ├── Domain/
-│   │   ├── Application/
-│   │   ├── Infrastructure/
-│   │   └── Data/
-│   │
-│   ├── Health/                      # namespace: SurvGame.Health
-│   ├── Crafting/                    # namespace: SurvGame.Crafting
-│   └── Shared/                      # namespace: SurvGame.Shared
-│
-├── FPSGame/                         # Layer 2: Generic FPS Systems
-│   ├── FPSGame.asmdef               # Depends on: SurvGame.asmdef
-│   │
-│   ├── Player/                      # namespace: FPSGame.Player
-│   │   ├── Domain/
-│   │   ├── Application/
-│   │   ├── Infrastructure/
-│   │   └── Data/
-│   │
-│   ├── Weapons/                     # namespace: FPSGame.Weapons
-│   ├── Camera/                      # namespace: FPSGame.Camera
-│   └── Shared/                      # namespace: FPSGame.Shared
-│
-└── SurvivalProject/                 # Layer 3: Your Specific Game
-    ├── SurvivalProject.asmdef        # Depends on: FPSGame.asmdef, SurvGame.asmdef
-    │
-    ├── Features/                    # namespace: SurvivalProject.Features
-    ├── Missions/
-    └── Configuration/
-```
+Ver **[09-Three-Layer-Architecture.md](../Architecture/09-Three-Layer-Architecture.md)** para la estructura completa de carpetas, assembly definitions y reglas de dependencia.
 
-### Layer Dependencies
-```
-SurvivalProject (Layer 3)
-    ↓ depends on
-FPSGame (Layer 2) ← Generic FPS systems
-    ↓ depends on  
-SurvGame (Layer 1) ← Generic survival systems
-```
+Resumen: `SurvGame (Layer 1)` → `FPSGame (Layer 2)` → `SurvivalProject (Layer 3)`. Cada feature tiene subcarpetas `Domain/`, `Infrastructure/`, `Data/` organizacionales (el namespace NO las refleja).
 
 ## Naming Conventions
 
@@ -375,122 +329,15 @@ namespace SurvGame.Player
 
 El proyecto usa [`com.torque-games.injector`](https://github.com/alvmivan/injector) para DI. Ver **[02-DI-Guidelines.md](02-DI-Guidelines.md)** para API completa, ejemplos y reglas de uso.
 
-## ScriptableObject Patterns
+## ScriptableObject, Testing, Layer Communication & Performance Patterns
 
-### Layer 1: SurvGame Configuration
-```csharp
-namespace SurvGame.Health
-{
-    [CreateAssetMenu(menuName = "Survival/Health Config")]
-    public class HealthConfig : ScriptableObject
-    {
-        public float MaxHealth = 100f;
-        public float RegenRate = 1f;
-    }
-}
-```
-
-### Layer 2: FPSGame Configuration (uses Layer 1)
-```csharp
-namespace FPSGame.Player
-{
-    using SurvGame.Health;
-    
-    [CreateAssetMenu(menuName = "FPS/Player Config")]
-    public class PlayerConfig : ScriptableObject
-    {
-        [Header("Movement")]
-        public float BaseSpeed = 5f;
-        public float RunSpeedMultiplier = 1.6f;
-        
-        [Header("References")]
-        public HealthConfig HealthConfig;  // From Layer 1
-    }
-}
-```
-
-## Testing Patterns
-
-### Testing Layer 1 (SurvGame - No Dependencies)
-```csharp
-namespace SurvGame.Health.Tests
-{
-    [TestFixture]
-    public class HealthEntityTests
-    {
-        private HealthEntity _health;
-        
-        [SetUp]
-        public void Setup()
-        {
-            _health = new HealthEntity(100f);
-        }
-        
-        [Test]
-        public void TakeDamage_ReducesHealth()
-        {
-            _health.TakeDamage(30f);
-            Assert.AreEqual(70f, _health.CurrentHealth);
-        }
-    }
-}
-```
-
-### Testing Layer 2 (FPSGame - Depends on Layer 1)
-```csharp
-namespace FPSGame.Player.Tests
-{
-    using SurvGame.Health;
-    
-    [TestFixture]
-    public class PlayerEntityTests
-    {
-        private PlayerEntity _player;
-        
-        [SetUp]
-        public void Setup()
-        {
-            _player = new PlayerEntity();
-        }
-        
-        [Test]
-        public void Move_ChangesPosition()
-        {
-            _player.Move(new Vector2(1, 0));
-            Assert.Greater(_player.Position.z, 0);
-        }
-    }
-}
-```
-
-## Documentation Standards
-
-### XML Documentation (With Layer References)
-```csharp
-namespace FPSGame.Player
-{
-    using SurvGame.Health;
-    
-    /// <summary>
-    /// Core player entity for FPS games.
-    /// Uses <see cref="HealthEntity"/> (Layer 1) via composition.
-    /// </summary>
-    public class PlayerEntity
-    {
-        /// <summary>Health component from Layer 1.</summary>
-        public HealthEntity Health { get; }
-
-        /// <summary>
-        /// Moves the player in the specified direction.
-        /// </summary>
-        /// <param name="direction">Movement direction (X: left/right, Y: forward/back).</param>
-        public void Move(Vector2 direction)
-        {
-            // Implementation
-        }
-    }
-}
-```
+Ver **[03-Patterns-And-Examples.md](03-Patterns-And-Examples.md)** para ejemplos completos de:
+- ScriptableObject configs por capa
+- Testing patterns por capa
+- XML documentation con layer references
+- Layer communication (exposure pattern)
+- What NOT to do (antipatterns)
+- Performance guidelines (Memory, CPU, GPU)
 
 ## Git Commit Standards
 
@@ -513,82 +360,8 @@ feature/survivalproject-story-missions
 bugfix/fpsgame-player-coyote-time
 ```
 
-## Layer Communication (Exposure Pattern)
-
-### How Layers Expose Functionality
-```csharp
-// Layer 1: SurvGame exposes to upper layers
-namespace SurvGame.Health
-{
-    public interface IDamageable { ... }
-    public class HealthEntity { ... }
-}
-
-// Layer 2: FPSGame uses Layer 1, exposes to Layer 3
-namespace FPSGame.Player
-{
-    using SurvGame.Health;
-    
-    public interface IMovable { ... }
-    public class PlayerEntity { ... }  // Uses HealthEntity via composition
-}
-
-// Layer 3: Your game uses both
-namespace SurvivalProject.Features
-{
-    using FPSGame.Player;
-    using SurvGame.Health;
-    
-    public class GameManager
-    {
-        private readonly IMovable _player;
-        
-        public GameManager(IMovable player)
-        {
-            _player = player;  // From Layer 2
-        }
-    }
-}
-```
-
-### What NOT to do
-```csharp
-// ❌ BAD: Layer 1 trying to use Layer 2 (circular dependency!)
-namespace SurvGame.Health
-{
-    using FPSGame.Player;  // ❌ NO! Can't reference upper layer!
-}
-
-// ❌ BAD: Deep namespace hierarchy
-namespace FPSGame.Player.Domain.Entities { }
-namespace SurvGame.Inventory.Items.Weapons { }
-
-// ✅ GOOD: Flat namespaces
-namespace FPSGame.Player { }
-namespace SurvGame.Inventory { }
-```
-
-## Performance Guidelines
-
-### Memory
-- Use object pooling for frequently created objects
-- Cache component references in Awake/Start
-- Use `ScriptableObject` references instead of copying data
-- Null-check events before invoking
-
-### CPU
-- Avoid GetComponent in Update
-- Use coroutines or async for expensive operations
-- State machine only updates active state
-- Cache LayerMask values
-
-### GPU
-- Use LOD for player models in third-person view
-- Optimize camera effects based on view mode
-- Batch similar materials
-
 ---
 
-**Version**: 2.1 (Three-Layer Architecture — cleaned duplicates)  
+**Version**: 2.2 (Extracted patterns to 03-Patterns-And-Examples.md)  
 **Last Updated**: 2026-05-04  
 **Compliance**: SOLID, Clean Architecture, DDD, Three-Layer
