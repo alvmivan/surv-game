@@ -4,24 +4,24 @@
 
 Ver **[09-Three-Layer-Architecture.md](../Architecture/09-Three-Layer-Architecture.md)** para la estructura completa de carpetas, assembly definitions y reglas de dependencia.
 
-Resumen: `SurvGame (Layer 1)` → `FPSGame (Layer 2)` → `SurvivalProject (Layer 3)`. Cada feature tiene subcarpetas `Domain/`, `Infrastructure/`, `Data/` organizacionales (el namespace NO las refleja).
+Resumen: `FPSGame (Layer 1)` → `SurvGame (Layer 2)` → `SurvivalProject (Layer 3)`. Cada feature tiene subcarpetas `Domain/`, `Infrastructure/`, `Data/` organizacionales (el namespace NO las refleja).
 
 ## Naming Conventions
 
 ### Three-Layer Namespace Convention (FLAT!)
 
 ```csharp
-// Layer 1: SurvGame (Generic Survival)
-namespace SurvGame.Inventory     // ✅ GOOD - Flat!
-namespace SurvGame.Health
-namespace SurvGame.Crafting
-
-// Layer 2: FPSGame (Generic FPS)
+// Layer 1: FPSGame (Generic FPS — base, sin dependencias)
 namespace FPSGame.Player        // ✅ GOOD - Flat!
 namespace FPSGame.Weapons
 namespace FPSGame.Camera
 
-// Layer 3: SurvivalProject (Your Game)
+// Layer 2: SurvGame (Generic Survival — is-a FPSGame)
+namespace SurvGame.Inventory     // ✅ GOOD - Flat!
+namespace SurvGame.Health
+namespace SurvGame.Crafting
+
+// Layer 3: SurvivalProject (Your Game — is-a SurvGame)
 namespace SurvivalProject.Features   // ✅ GOOD - Flat!
 namespace SurvivalProject.Missions
 
@@ -55,27 +55,24 @@ namespace SurvivalProject.Features
 
 ### Layer Exposure (How layers communicate)
 ```csharp
-// Layer 1 exposes to upper layers:
-namespace SurvGame.Inventory
-{
-    public interface IItemContainer { ... }
-    public class InventorySystem { ... }
-    public class ItemAddedEvent { ... }
-}
-
-// Layer 2 uses Layer 1, exposes to Layer 3:
+// Layer 1 (FPSGame) exposes to upper layers:
 namespace FPSGame.Player
 {
-    using SurvGame.Inventory;  // Can use Layer 1
-    
-    public interface IPlayerInput { ... }
     public interface IMovable { ... }
-    public class PlayerController : MonoBehaviour { ... }
+    public class PlayerMotor { ... }
+}
+
+// Layer 2 (SurvGame) uses Layer 1:
+namespace SurvGame.Health
+{
+    using FPSGame.Player;  // Layer 2 CAN use Layer 1
+    
+    public class HealthComponent { }
 }
 
 // Layer 3 imports both:
-using SurvGame.Inventory;  // Layer 1
-using FPSGame.Player;      // Layer 2
+using FPSGame.Player;      // Layer 1
+using SurvGame.Health;     // Layer 2
 ```
 
 ### Interfaces
@@ -239,19 +236,19 @@ namespace SurvGame.Player  // ONE namespace, flat!
 
 ### Single Responsibility (Across Layers)
 ```csharp
-// Layer 1: SurvGame
-namespace SurvGame.Health
-{
-    public class HealthEntity { }  // Only health
-}
-
-// Layer 2: FPSGame (uses Layer 1)
+// Layer 1: FPSGame (base, movement only)
 namespace FPSGame.Player
 {
     // Each class has ONE job
     public class PlayerMotor : IMovable { }      // Only movement
     public class PlayerCamera : ICameraController { } // Only camera
     public class InputProvider : IPlayerInput { }   // Only input
+}
+
+// Layer 2: SurvGame (health on top of FPS)
+namespace SurvGame.Health
+{
+    public class HealthEntity { }  // Only health
 }
 
 // Layer 3: SurvivalProject (uses both)

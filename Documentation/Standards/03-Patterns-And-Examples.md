@@ -6,7 +6,7 @@ Ejemplos concretos de código para las convenciones definidas en [Coding-Standar
 
 ## ScriptableObject Patterns
 
-### Layer 1: SurvGame Configuration
+### Layer 2: SurvGame Configuration
 ```csharp
 namespace SurvGame.Health
 {
@@ -42,7 +42,7 @@ namespace FPSGame.Player
 
 ## Testing Patterns
 
-### Testing Layer 1 (SurvGame - No Dependencies)
+### Testing Layer 2 (SurvGame - Depends on FPSGame)
 ```csharp
 namespace SurvGame.Health.Tests
 {
@@ -129,20 +129,20 @@ namespace FPSGame.Player
 
 ### How Layers Expose Functionality
 ```csharp
-// Layer 1: SurvGame exposes to upper layers
-namespace SurvGame.Health
-{
-    public interface IDamageable { ... }
-    public class HealthEntity { ... }
-}
-
-// Layer 2: FPSGame uses Layer 1, exposes to Layer 3
+// Layer 1: FPSGame exposes to upper layers
 namespace FPSGame.Player
 {
-    using SurvGame.Health;
-    
     public interface IMovable { ... }
-    public class PlayerEntity { ... }  // Uses HealthEntity via composition
+    public class PlayerEntity { ... }
+}
+
+// Layer 2: SurvGame uses Layer 1, exposes to Layer 3
+namespace SurvGame.Health
+{
+    using FPSGame.Player;
+    
+    public interface IDamageable { ... }
+    public class HealthEntity { ... }
 }
 
 // Layer 3: Your game uses both
@@ -154,10 +154,12 @@ namespace SurvivalProject.Features
     public class GameManager
     {
         private readonly IMovable _player;
+        private readonly IDamageable _health;
         
-        public GameManager(IMovable player)
+        public GameManager(IMovable player, IDamageable health)
         {
-            _player = player;  // From Layer 2
+            _player = player;  // From Layer 1
+            _health = health;  // From Layer 2
         }
     }
 }
@@ -166,9 +168,9 @@ namespace SurvivalProject.Features
 ### What NOT to do
 ```csharp
 // ❌ BAD: Layer 1 trying to use Layer 2 (circular dependency!)
-namespace SurvGame.Health
+namespace FPSGame.Player
 {
-    using FPSGame.Player;  // ❌ NO! Can't reference upper layer!
+    using SurvGame.Health;  // ❌ NO! Can't reference upper layer!
 }
 
 // ❌ BAD: Deep namespace hierarchy

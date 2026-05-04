@@ -6,7 +6,7 @@ Este archivo define las reglas que cualquier agente de IA (Windsurf/Cascade, Ope
 
 ## Proyecto
 
-First Person Survival game en **Unity 6000.2.6f2+**. Arquitectura en tres capas reutilizables: `SurvGame` (survival genérico) → `FPSGame` (FPS genérico) → `SurvivalProject` (el juego concreto). Usa SOLID, Clean Architecture interna por feature, y patrones AAA (Controller/Pawn, State Machine, Strategy para view modes).
+First Person Survival game en **Unity 6000.2.6f2+**. Arquitectura en tres capas reutilizables: `FPSGame` (FPS genérico) → `SurvGame` (survival genérico, es un FPS) → `SurvivalProject` (el juego concreto, es un survival). Usa SOLID, Clean Architecture interna por feature, y patrones AAA (Controller/Pawn, State Machine, Strategy para view modes).
 
 ---
 
@@ -25,8 +25,8 @@ First Person Survival game en **Unity 6000.2.6f2+**. Arquitectura en tres capas 
 ├── README.md
 └── My project/                     ← Proyecto Unity
     └── Assets/
-        ├── SurvGame/               ← Layer 1: survival genérico (sin dependencias)
-        ├── FPSGame/                ← Layer 2: FPS genérico (depende de SurvGame)
+        ├── FPSGame/                ← Layer 1: FPS genérico (sin dependencias)
+        ├── SurvGame/               ← Layer 2: survival genérico (depende de FPSGame)
         └── SurvivalProject/        ← Layer 3: el juego concreto (depende de ambas)
 ```
 
@@ -73,9 +73,9 @@ Esto aplica para decisiones de arquitectura, valores de diseño basados en inves
 ### Arquitectura de tres capas
 
 ```
-SurvGame (Layer 1)    ← NO puede referenciar FPSGame ni SurvivalProject
+FPSGame (Layer 1)     ← NO puede referenciar SurvGame ni SurvivalProject
     ↑
-FPSGame (Layer 2)     ← Puede referenciar SurvGame. NO puede referenciar SurvivalProject
+SurvGame (Layer 2)    ← Puede referenciar FPSGame. NO puede referenciar SurvivalProject
     ↑
 SurvivalProject (Layer 3) ← Puede referenciar ambas
 ```
@@ -181,4 +181,4 @@ bugfix/fpsgame-player-coyote-time
 - **No usar `namespace MyGame.*`** en ejemplos. Usar los namespaces reales del proyecto (`SurvGame.*`, `FPSGame.*`, `SurvivalProject.*`).
 - **No hardcodear valores de diseño en código.** Usar `ScriptableObject` configs.
 - **No poner lógica de dominio en MonoBehaviours.** Extraer a clases puras testeables.
-- **No crear dependencias circulares entre capas.** Layer 1 nunca importa Layer 2 o 3.
+- **No crear dependencias circulares entre capas.** FPSGame (Layer 1) nunca importa SurvGame o SurvivalProject.
