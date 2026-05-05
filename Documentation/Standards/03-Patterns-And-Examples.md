@@ -67,7 +67,7 @@ namespace SurvGame.Health.Tests
     [TestFixture]
     public class HealthEntityTests
     {
-        private HealthEntity _health;
+         HealthEntity _health;
         
         [SetUp]
         public void Setup()
@@ -94,7 +94,7 @@ namespace FPSGame.Player.Tests
     [TestFixture]
     public class PlayerEntityTests
     {
-        private PlayerEntity _player;
+         PlayerEntity _player;
         
         [SetUp]
         public void Setup()
@@ -171,8 +171,8 @@ namespace SurvivalProject.Features
     
     public class GameManager
     {
-        private readonly IMovable _player;
-        private readonly IDamageable _health;
+         readonly IMovable _player;
+         readonly IDamageable _health;
         
         public GameManager(IMovable player, IDamageable health)
         {

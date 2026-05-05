@@ -15,12 +15,12 @@ namespace FPSGame.Player
     public class PlayerEntity
     {
         // Dependencies (injected)
-        private readonly IPlayerStats _stats;
-        private readonly IEventBus _eventBus;
+         readonly IPlayerStats _stats;
+         readonly IEventBus _eventBus;
 
         // State
-        public float CurrentHealth { get; private set; }
-        public MovementState CurrentState { get; private set; }
+        public float CurrentHealth { get; set; }
+        public MovementState CurrentState { get; set; }
 
         // Events
         public event Action<float> OnHealthChanged;
@@ -57,7 +57,7 @@ namespace FPSGame.Player
 
         // Private Methods
         
-        private void Die()
+         void Die()
         {
             CurrentState = MovementState.Idle; // TODO: add Dead state if needed
             _eventBus.Publish(new PlayerDiedEvent());
@@ -80,23 +80,23 @@ namespace FPSGame.Player
     public class PlayerMotor : MonoBehaviour
     {
         // Dependencies (injected via Unity Inspector or DI)
-        [SerializeField] private PlayerConfig _config;
-        [SerializeField] private InputProvider _inputProvider;
+        [SerializeField] PlayerConfig _config;
+        [SerializeField] InputProvider _inputProvider;
 
         // Private Fields
-        private PlayerEntity _playerEntity;
-        private CharacterController _characterController;
-        private Vector3 _velocity;
+         PlayerEntity _playerEntity;
+         CharacterController _characterController;
+         Vector3 _velocity;
 
         // Unity Lifecycle
         
-        private void Awake()
+         void Awake()
         {
             _characterController = GetComponent<CharacterController>();
             _playerEntity = new PlayerEntity(_config, new UnityEventBus());
         }
 
-        private void Update()
+         void Update()
         {
             ApplyGravity();
             HandleMovement();
@@ -104,25 +104,25 @@ namespace FPSGame.Player
 
         // Private Methods
         
-        private void HandleMovement()
+         void HandleMovement()
         {
             Vector3 moveDirection = CalculateMoveDirection();
             float speed = CalculateSpeed();
             _characterController.Move(moveDirection * speed * Time.deltaTime);
         }
 
-        private Vector3 CalculateMoveDirection()
+         Vector3 CalculateMoveDirection()
         {
             return transform.right * _inputProvider.MoveInput.x + 
                    transform.forward * _inputProvider.MoveInput.y;
         }
 
-        private float CalculateSpeed()
+         float CalculateSpeed()
         {
             return _inputProvider.IsRunning ? _config.RunSpeed : _config.WalkSpeed;
         }
 
-        private void ApplyGravity()
+         void ApplyGravity()
         {
             if (_characterController.isGrounded)
             {
@@ -146,7 +146,7 @@ namespace FPSGame.Player
 ```csharp
 public class StateMachine
 {
-    public IState CurrentState { get; private set; }
+    public IState CurrentState { get; set; }
     
     public void ChangeState(IState newState)
     {
@@ -168,9 +168,9 @@ public class StateMachine
 ```csharp
 public class MockState : IState
 {
-    public bool EnterCalled { get; private set; }
-    public bool ExitCalled { get; private set; }
-    public bool UpdateCalled { get; private set; }
+    public bool EnterCalled { get; set; }
+    public bool ExitCalled { get; set; }
+    public bool UpdateCalled { get; set; }
     
     public void Enter() => EnterCalled = true;
     public void Exit() => ExitCalled = true;

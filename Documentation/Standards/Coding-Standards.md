@@ -114,11 +114,13 @@ namespace SurvGame.Player
 ```csharp
 namespace SurvGame.Player
 {
-    [CreateAssetMenu(menuName = "Player/Player Config")]
+    [CreateAssetMenu(menuName = "SurvGame/Player Config")]
     public class PlayerConfig : ScriptableObject 
     { 
         public float WalkSpeed = 5f;
         public float RunSpeedMultiplier = 1.6f;
+        
+        // Valores de diseño viven en SO, no como magic numbers en código
     }
 }
 ```
@@ -174,12 +176,12 @@ namespace SurvGame.Player  // ONE namespace, flat!
     public class PlayerEntity : IDamageable, IHealable
     {
         // Dependencies (injected)
-        private readonly IPlayerStats _stats;
-        private readonly IEventBus _eventBus;
+        readonly IPlayerStats _stats;
+        readonly IEventBus _eventBus;
 
         // State
-        public float CurrentHealth { get; private set; }
-        public MovementState CurrentMovementState { get; private set; }
+        public float CurrentHealth { get; set; }
+        public MovementState CurrentMovementState { get; set; }
 
         // Events
         public event Action<PlayerDamagedEvent> OnDamaged;
@@ -206,9 +208,10 @@ namespace SurvGame.Player  // ONE namespace, flat!
         }
 
         // Private Methods
-        private float CalculateReducedDamage(DamageData damage)
+        float CalculateReducedDamage(DamageData damage)
         {
-            return damage.Amount * (1 - _stats.GetResistance(damage.Type));
+            const float fullResistance = 1f;
+            return damage.Amount * (fullResistance - _stats.GetResistance(damage.Type));
         }
     }
 }
@@ -227,6 +230,39 @@ Organize class members in this order, using comments to separate sections:
 8. Public Methods
 9. Protected Methods
 10. Private Methods
+
+### Access Modifiers
+- **No usar `private`**: es implícito en C#. Solo declarar `public`, `protected`, o `internal` cuando sea necesario.
+- `readonly` en campos que no cambian después del constructor.
+
+```csharp
+// ✅ GOOD: private es implícito
+readonly IPlayerStats _stats;
+float _currentHealth;
+
+// ❌ BAD: redundante
+private readonly IPlayerStats _stats;
+private float _currentHealth;
+```
+
+### Magic Numbers
+- **Usar `const` para cualquier valor que no sea 0 o 1** (o valores obvios como -1 para "no encontrado").
+- Los valores de diseño viven en ScriptableObjects, no hardcodeados.
+
+```csharp
+// ✅ GOOD: const para valores con significado
+const float fullResistance = 1f;
+const int maxRetries = 3;
+const float groundCheckDistance = 0.2f;
+
+// ✅ OK: 0 y 1 son auto-explicativos en contexto
+if (health <= 0) Die();
+for (int i = 0; i < items.Count; i++) { }
+
+// ❌ BAD: magic numbers sin explicación
+if (health <= 0.2f) PlayLowHealthSound();  // ¿Qué significa 0.2?
+_characterController.Move(_velocity * 0.02f);  // ¿Por qué 0.02?
+```
 
 ## SOLID Implementation Examples
 
@@ -308,7 +344,7 @@ namespace SurvGame.Player
     // GOOD: Depends on abstraction
     public class PlayerMotor
     {
-        private readonly IPlayerInput _input;
+        readonly IPlayerInput _input;
         
         public PlayerMotor(IPlayerInput input)
         {

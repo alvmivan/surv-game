@@ -10,8 +10,8 @@ Cómo escribir código limpio y testeable para el Player Controller, siguiendo A
 ```csharp
 public class PlayerMotor
 {
-    private PlayerConfig _config = Resources.Load<PlayerConfig>("PlayerConfig");
-    private InputProvider _input = FindObjectOfType<InputProvider>();
+     PlayerConfig _config = Resources.Load<PlayerConfig>("PlayerConfig");
+     InputProvider _input = FindObjectOfType<InputProvider>();
     
     public void Move()
     {
@@ -25,8 +25,8 @@ public class PlayerMotor
 ```csharp
 public class PlayerMotor
 {
-    private readonly IPlayerConfig _config;
-    private readonly IPlayerInput _input;
+     readonly IPlayerConfig _config;
+     readonly IPlayerInput _input;
     
     // Dependencies inyectadas via constructor
     public PlayerMotor(IPlayerConfig config, IPlayerInput input)
@@ -159,7 +159,7 @@ public interface IPhysicsService
 
 public class GroundDetector
 {
-    private readonly IPhysicsService _physics;
+     readonly IPhysicsService _physics;
     
     public GroundDetector(IPhysicsService physics)
     {
@@ -206,12 +206,12 @@ public class PlayerMotor : MonoBehaviour
 **Good** (domain entity, separate — immutable where possible):
 ```csharp
 // Domain Layer (testeable sin Unity)
-// NOTE: Properties with private setters don't serialize in Unity.
+// NOTE: Properties don't serialize in Unity by default.
 // Use fields for Unity-serializable state, or reconstruct from save data.
 public class PlayerEntity
 {
     // For Unity serialization: use field + readonly if immutable
-    [SerializeField] private float _health;
+    [SerializeField]  float _health;
     
     // Prefer exposing as property for encapsulation
     public float Health => _health;
@@ -236,8 +236,8 @@ public class PlayerEntity
 // Infrastructure Layer (Unity specific)
 public class PlayerMotor : MonoBehaviour
 {
-    [SerializeField] private float _initialHealth = 100f;
-    private PlayerEntity _entity;
+    [SerializeField]  float _initialHealth = 100f;
+     PlayerEntity _entity;
     
     void Awake()
     {
