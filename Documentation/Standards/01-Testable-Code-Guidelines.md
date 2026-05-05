@@ -203,33 +203,50 @@ public class PlayerMotor : MonoBehaviour
 }
 ```
 
-**Good** (domain entity, separate):
+**Good** (domain entity, separate — immutable where possible):
 ```csharp
 // Domain Layer (testeable sin Unity)
+// NOTE: Properties with private setters don't serialize in Unity.
+// Use fields for Unity-serializable state, or reconstruct from save data.
 public class PlayerEntity
 {
-    public float Health { get; private set; }
+    // For Unity serialization: use field + readonly if immutable
+    [SerializeField] private float _health;
     
-    public void TakeDamage(float amount)
+    // Prefer exposing as property for encapsulation
+    public float Health => _health;
+    public bool IsAlive => _health > 0;
+    
+    // Constructor for initial state (immutable pattern)
+    public PlayerEntity(float maxHealth)
     {
-        Health -= amount;
-        if (Health <= 0) Die();
+        _health = maxHealth;
     }
+    
+    // Returns new instance instead of mutating (immutable approach)
+    public PlayerEntity TakeDamage(float amount)
+    {
+        return new PlayerEntity(Mathf.Max(0, _health - amount));
+    }
+    
+    // Or if mutation is required, keep it encapsulated:
+    public void TakeDamage(float amount) => _health = Mathf.Max(0, _health - amount);
 }
 
 // Infrastructure Layer (Unity specific)
 public class PlayerMotor : MonoBehaviour
 {
+    [SerializeField] private float _initialHealth = 100f;
     private PlayerEntity _entity;
     
-    void Update()
+    void Awake()
     {
-        _entity.TakeDamage(10f);
+        _entity = new PlayerEntity(_initialHealth);
     }
 }
 ```
 
-**Why**: Puedes testear PlayerEntity sin Unity:
+**Why**: Puedes testear PlayerEntity sin Unity. Inmutabilidad evita side-effects:
 ```csharp
 [Test]
 public void TakeDamage_ReducesHealth()
@@ -245,9 +262,9 @@ public void TakeDamage_ReducesHealth()
 ## Code Templates
 
 Ver **[04-Code-Templates.md](04-Code-Templates.md)** para templates completos de:
-- Domain Entity (PlayerEntity con regions, DI, events)
+- Domain Entity (PlayerEntity con DI, events — sin regions)
 - Infrastructure MonoBehaviour (PlayerMotor con CharacterController)
-- State Machine testing (MockState, tests de ChangeState)
+- State Machine testing (MockState, tests Given-When-Then)
 
 ---
 
@@ -260,8 +277,8 @@ Ver **[04-Code-Templates.md](04-Code-Templates.md)** para templates completos de
 - [ ] Is the class focused on one responsibility?
 
 ### Writing Tests
-- [ ] Test naming: `MethodName_ExpectedBehavior_WhenCondition()`
-- [ ] Arrange-Act-Assert pattern
+- [ ] Test naming: `Given_Precondition_When_Action_Then_ExpectedResult()`
+- [ ] Given-When-Then pattern (Given context, When action, Then result)
 - [ ] One assertion per test (or group of related assertions)
 - [ ] Mocks only for dependencies, not internals
 

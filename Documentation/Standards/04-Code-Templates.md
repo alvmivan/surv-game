@@ -10,33 +10,31 @@ namespace FPSGame.Player
 {
     /// <summary>
     /// Core player entity with state and behavior.
+    /// Dependencies injected via constructor.
     /// </summary>
     public class PlayerEntity
     {
-        #region Dependencies (injected)
+        // Dependencies (injected)
         private readonly IPlayerStats _stats;
         private readonly IEventBus _eventBus;
-        #endregion
 
-        #region State
+        // State
         public float CurrentHealth { get; private set; }
         public MovementState CurrentState { get; private set; }
-        #endregion
 
-        #region Events
+        // Events
         public event Action<float> OnHealthChanged;
-        #endregion
 
-        #region Constructor
+        // Constructor
         public PlayerEntity(IPlayerStats stats, IEventBus eventBus)
         {
             _stats = stats ?? throw new ArgumentNullException(nameof(stats));
             _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
             CurrentHealth = _stats.MaxHealth;
         }
-        #endregion
 
-        #region Public Methods
+        // Public Methods
+        
         /// <summary>
         /// Applies damage to the player.
         /// </summary>
@@ -56,15 +54,14 @@ namespace FPSGame.Player
             }
             return true;
         }
-        #endregion
 
-        #region Private Methods
+        // Private Methods
+        
         private void Die()
         {
             CurrentState = MovementState.Idle; // TODO: add Dead state if needed
             _eventBus.Publish(new PlayerDiedEvent());
         }
-        #endregion
     }
 }
 ```
@@ -77,22 +74,22 @@ namespace FPSGame.Player
 {
     /// <summary>
     /// Unity-specific player controller facade.
+    /// Dependencies injected via Inspector or DI container.
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
     public class PlayerMotor : MonoBehaviour
     {
-        #region Dependencies (injected via Unity Inspector or DI)
+        // Dependencies (injected via Unity Inspector or DI)
         [SerializeField] private PlayerConfig _config;
         [SerializeField] private InputProvider _inputProvider;
-        #endregion
 
-        #region Private Fields
+        // Private Fields
         private PlayerEntity _playerEntity;
         private CharacterController _characterController;
         private Vector3 _velocity;
-        #endregion
 
-        #region Unity Lifecycle
+        // Unity Lifecycle
+        
         private void Awake()
         {
             _characterController = GetComponent<CharacterController>();
@@ -104,9 +101,9 @@ namespace FPSGame.Player
             ApplyGravity();
             HandleMovement();
         }
-        #endregion
 
-        #region Private Methods
+        // Private Methods
+        
         private void HandleMovement()
         {
             Vector3 moveDirection = CalculateMoveDirection();
@@ -137,7 +134,6 @@ namespace FPSGame.Player
             }
             _characterController.Move(_velocity * Time.deltaTime);
         }
-        #endregion
     }
 }
 ```
@@ -182,35 +178,35 @@ public class MockState : IState
 }
 ```
 
-### Tests
+### Tests (Given-When-Then pattern)
 ```csharp
 [Test]
-public void ChangeState_CallsExitOnOldState()
+public void Given_ActiveState_When_ChangeState_Then_CallsExitOnOldState()
 {
-    // Arrange
+    // Given
     var machine = new StateMachine();
     var oldState = new MockState();
     var newState = new MockState();
     machine.ChangeState(oldState);
     
-    // Act
+    // When
     machine.ChangeState(newState);
     
-    // Assert
+    // Then
     Assert.IsTrue(oldState.ExitCalled);
 }
 
 [Test]
-public void ChangeState_CallsEnterOnNewState()
+public void Given_EmptyMachine_When_ChangeState_Then_CallsEnterOnNewState()
 {
-    // Arrange
+    // Given
     var machine = new StateMachine();
     var newState = new MockState();
     
-    // Act
+    // When
     machine.ChangeState(newState);
     
-    // Assert
+    // Then
     Assert.IsTrue(newState.EnterCalled);
 }
 ```

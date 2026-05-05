@@ -10,7 +10,8 @@ Ejemplos concretos de código para las convenciones definidas en [Coding-Standar
 ```csharp
 namespace SurvGame.Health
 {
-    [CreateAssetMenu(menuName = "Survival/Health Config")]
+    // Menu path indicates layer: "SurvGame/..."
+    [CreateAssetMenu(menuName = "SurvGame/Health Config")]
     public class HealthConfig : ScriptableObject
     {
         public float MaxHealth = 100f;
@@ -19,21 +20,38 @@ namespace SurvGame.Health
 }
 ```
 
-### Layer 2: FPSGame Configuration (uses Layer 1)
+### Layer 1: FPSGame Configuration
 ```csharp
 namespace FPSGame.Player
 {
-    using SurvGame.Health;
-    
-    [CreateAssetMenu(menuName = "FPS/Player Config")]
+    // Menu path indicates layer: "FPSGame/..."
+    [CreateAssetMenu(menuName = "FPSGame/Player Config")]
     public class PlayerConfig : ScriptableObject
     {
         [Header("Movement")]
         public float BaseSpeed = 5f;
         public float RunSpeedMultiplier = 1.6f;
-        
+    }
+}
+```
+
+### Layer 3: SurvivalProject Configuration
+```csharp
+namespace SurvivalProject.Configuration
+{
+    using FPSGame.Player;
+    using SurvGame.Health;
+    
+    // Menu path indicates layer: "SurvivalProject/..."
+    [CreateAssetMenu(menuName = "SurvivalProject/Game Config")]
+    public class GameConfig : ScriptableObject
+    {
         [Header("References")]
-        public HealthConfig HealthConfig;  // From Layer 1
+        public PlayerConfig PlayerConfig;   // From Layer 1
+        public HealthConfig HealthConfig;     // From Layer 2
+        
+        [Header("Game-Specific")]
+        public string GameTitle = "My Survival Game";
     }
 }
 ```

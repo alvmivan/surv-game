@@ -32,24 +32,24 @@ namespace FPSGame.Player.Domain.Interfaces // ❌ NO!
 
 ### Layer Usage Rules
 ```csharp
-// SurvGame can NOT use FPSGame or SurvivalProject
-namespace SurvGame.Inventory
-{
-    // ❌ BAD: using FPSGame.Player;  // Circular dependency!
-}
-
-// FPSGame CAN use SurvGame, but NOT SurvivalProject
+// FPSGame (Layer 1) can NOT use SurvGame or SurvivalProject
 namespace FPSGame.Player
 {
-    using SurvGame.Health;  // ✅ GOOD
+    // ❌ BAD: using SurvGame.Health;  // Circular dependency!
+}
+
+// SurvGame (Layer 2) CAN use FPSGame, but NOT SurvivalProject
+namespace SurvGame.Health
+{
+    using FPSGame.Player;    // ✅ GOOD: Layer 2 uses Layer 1
     // ❌ BAD: using SurvivalProject.Features;
 }
 
-// SurvivalProject can use BOTH
+// SurvivalProject (Layer 3) can use BOTH
 namespace SurvivalProject.Features
 {
-    using FPSGame.Player;    // ✅ GOOD
-    using SurvGame.Health;   // ✅ GOOD
+    using FPSGame.Player;    // ✅ GOOD: Layer 3 uses Layer 1
+    using SurvGame.Health;   // ✅ GOOD: Layer 3 uses Layer 2
 }
 ```
 
@@ -173,30 +173,26 @@ namespace SurvGame.Player  // ONE namespace, flat!
     /// </summary>
     public class PlayerEntity : IDamageable, IHealable
     {
-        #region Dependencies (injected)
+        // Dependencies (injected)
         private readonly IPlayerStats _stats;
         private readonly IEventBus _eventBus;
-        #endregion
 
-        #region State
+        // State
         public float CurrentHealth { get; private set; }
         public MovementState CurrentMovementState { get; private set; }
-        #endregion
 
-        #region Events
+        // Events
         public event Action<PlayerDamagedEvent> OnDamaged;
-        #endregion
 
-        #region Constructor
+        // Constructor
         public PlayerEntity(IPlayerStats stats, IEventBus eventBus)
         {
             _stats = stats ?? throw new ArgumentNullException(nameof(stats));
             _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
             CurrentHealth = stats.MaxHealth;
         }
-        #endregion
 
-        #region Public Methods
+        // Public Methods
         public void TakeDamage(DamageData damage)
         {
             if (damage == null) throw new ArgumentNullException(nameof(damage));
@@ -208,19 +204,19 @@ namespace SurvGame.Player  // ONE namespace, flat!
             _eventBus.Publish(eventData);
             OnDamaged?.Invoke(eventData);
         }
-        #endregion
 
-        #region Private Methods
+        // Private Methods
         private float CalculateReducedDamage(DamageData damage)
         {
             return damage.Amount * (1 - _stats.GetResistance(damage.Type));
         }
-        #endregion
     }
 }
 ```
 
-### Region Order
+### Member Order (Organizational — no C# regions needed)
+Organize class members in this order, using comments to separate sections:
+
 1. Dependencies (injected)
 2. Constants/Statics
 3. Serialized Fields (Unity only)
